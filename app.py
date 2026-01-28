@@ -1838,8 +1838,8 @@ def show_analytics():
             st.plotly_chart(fig1, use_container_width=True)
             
             # Waste Type Distribution
-            waste_counts = historical_data['waste_type'].value_counts().reset_index()
-            waste_counts.columns = ['Waste Type', 'Count']
+            waste_counts = historical_data['area_type'].value_counts().reset_index()
+            waste_counts.columns = ['area_type', 'Count']
             
             fig2 = px.pie(waste_counts, values='Count', names='Waste Type',
                          title='Waste Type Composition',
