@@ -241,8 +241,30 @@ st.markdown("""
         padding-bottom: 10px;
         border-bottom: 3px solid #00C853;
     }
+<style>
+    /* Force the main app background */
+    .stApp { background-color: #0e1117 !important; }
+    
+    /* FIX: Challenges/Feature Cards Visibility */
+    .feature-card {
+        background-color: rgba(255, 255, 255, 0.95) !important; /* Semi-transparent white */
+        color: #000000 !important; /* Force black text */
+        border-radius: 15px;
+        padding: 20px;
+        border: 2px solid #00C853;
+        margin-bottom: 20px;
+    }
+    
+    /* Ensure all text inside feature cards is visible */
+    .feature-card h4, .feature-card p, .feature-card h2 {
+        color: #000000 !important;
+    }
+
+    /* Home Page Main Text Visibility */
+    .main-header { color: #00C853 !important; font-weight: 800; }
+    .sub-header { color: #ffffff !important; } /* White text on dark background */
+    p, span, label { color: #ffffff; } /* Default app text to white */
 </style>
-""", unsafe_allow_html=True)
 
 # ==========================================
 # 🔧 CONFIGURATION & INITIALIZATION
