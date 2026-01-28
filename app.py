@@ -43,6 +43,47 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+# ==========================================
+# 🔥 FIREBASE LIVE BIN FETCH (REAL ESP32 DATA)
+# ==========================================
+
+FIREBASE_URL = "https://smart-bin-7efab-default-rtdb.firebaseio.com"
+
+def fetch_live_bins():
+    try:
+        r = requests.get(f"{FIREBASE_URL}/bins.json", timeout=5)
+        data = r.json()
+
+        if not data:
+            return []
+
+        bins = []
+        for bin_id, b in data.items():
+            fill = int(b.get("fill_level", 0))
+
+            status = (
+                "Normal" if fill < 60
+                else "Warning" if fill < 85
+                else "Critical"
+            )
+
+            bins.append({
+                'bin_id': bin_id,
+                'location': (b.get('lat'), b.get('lon')),
+                'fill_level': fill,
+                'status': status,
+                'last_updated': datetime.now(),
+                'weight_kg': b.get('weight_kg', 0),
+                'address': b.get('address', 'ESP32 Smart Bin'),
+                'capacity_liters': b.get('capacity', 240)
+            })
+
+        return bins
+
+    except Exception as e:
+        st.warning("⏳ Waiting for Firebase live data…")
+        return []
+
 
 # Custom CSS matching your screenshot design
 st.markdown("""
@@ -892,31 +933,57 @@ def show_landing_page():
 def show_realtime_monitoring():
     """Show real-time monitoring dashboard"""
     st.title("🌍 Real-Time Monitoring Dashboard")
-    
-    # Generate data
-    bins = generate_realtime_bin_data()
+
+    # 🔴 LIVE CONTROL (Infinity OS style)
+    col_live, col_btn = st.columns([1, 4])
+    with col_live:
+        live_mode = st.toggle("🔴 LIVE DATA", value=True)
+    with col_btn:
+        if st.button("🔄 Refresh Once"):
+            st.rerun()
+
+    # 🔥 LIVE DATA FROM FIREBASE
+    bins = fetch_live_bins()
     drivers = generate_driver_locations()
-    
-    # Top Metrics Row
+
+    # =========================
+    # 📊 TOP METRICS
+    # =========================
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
-        active_bins = len(bins)
-        st.metric("Active Bins", active_bins, "24")
-    
+        st.metric("Active Bins", len(bins))
+
     with col2:
         critical_bins = len([b for b in bins if b['status'] == 'Critical'])
-        st.metric("Need Collection", critical_bins, "3")
-    
+        st.metric("Need Collection", critical_bins)
+
     with col3:
-        avg_fill = np.mean([b['fill_level'] for b in bins])
-        st.metric("Avg Fill Level", f"{avg_fill:.1f}%", "68%")
-    
+        if bins:
+            avg_fill = np.mean([b['fill_level'] for b in bins])
+            st.metric("Avg Fill Level", f"{avg_fill:.1f}%")
+        else:
+            st.metric("Avg Fill Level", "0%")
+
     with col4:
-        st.metric("Scheduled Pickups", "12", "Today")
-    
+        scheduled = len([b for b in bins if b['fill_level'] > 70])
+        st.metric("Scheduled Pickups", scheduled)
+
     st.divider()
-    
+
+    # =====================================================
+    # ⬇️⬇️ KEEP **ALL YOUR EXISTING MAP / ALERT / ROUTE CODE BELOW THIS**
+    # =====================================================
+
+    # (DO NOT change anything below in your file)
+
+    # =====================================================
+
+    # 🔁 AUTO-REFRESH (ONLY IF LIVE MODE IS ON)
+    if live_mode:
+        time.sleep(1)   # 1-second heartbeat
+        st.rerun()
+
     # Map and Status Side-by-side
     col1, col2 = st.columns([3, 2])
     
@@ -2414,7 +2481,8 @@ def main():
         st.divider()
         
         # Quick Stats
-        bins = generate_realtime_bin_data()
+        bins = fetch_live_bins()
+
         critical_bins = len([b for b in bins if b['status'] == 'Critical'])
         
         st.metric("Active Bins", len(bins))
