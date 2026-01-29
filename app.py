@@ -291,53 +291,7 @@ st.markdown("""
 # ==========================================
 # 🔧 FIREBASE SETUP (OPTIONAL)
 # ==========================================
-def setup_firebase():
-    """Optional Firebase setup - works without it too"""
-    try:
-        # Try to get from secrets (Streamlit Cloud)
-        api_key = st.secrets.get("FIREBASE_API_KEY", "")
-        db_url = st.secrets.get("FIREBASE_DB_URL", "")
-        
-        if api_key and db_url:
-            # Initialize Firebase if credentials exist
-            import firebase_admin
-            from firebase_admin import credentials
-            
-            cred = credentials.Certificate({
-                "type": "service_account",
-                "project_id": "smart-waste-system",
-                "private_key_id": "",
-                "private_key": "",
-                "client_email": "",
-                "client_id": "",
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                "client_x509_cert_url": ""
-            })
-            
-            firebase_admin.initialize_app(cred, {'databaseURL': db_url})
-            return True
-    except:
-        pass
-    
-    return False
 
-# Check if Firebase is available
-FIREBASE_AVAILABLE = setup_firebase()
-# Firebase Configuration (using YOUR credentials)
-FIREBASE_CONFIGS = {
-    'primary': {
-        'apiKey': "AIzaSyAfDSZS8t7tNm2C9y8YCR-N_KTMQ5kKdUw",
-        'databaseURL': "https://smart-bin-7efab-default-rtdb.firebaseio.com",
-        'projectId': "smart-bin-7efab"
-    },
-    'secondary': {
-        'apiKey': "AIzaSyBDd_IdStOzAuw5rL6Iwktkef920uc46mg",
-        'databaseURL': "https://smart-bin-c89ea-default-rtdb.firebaseio.com",
-        'projectId': "smart-bin-c89ea"
-    }
-}
 
 # Parbhani Coordinates (Vasant Naik College)
 Parbhani_COORDS = {
